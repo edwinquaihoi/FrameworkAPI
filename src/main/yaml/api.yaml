@@ -73,7 +73,7 @@ x-ibm-configuration:
                     source: "apim.setvariable('operation','getPosts');"
       - gatewayscript:
           title: Log Request
-          source: >
+          source: >-
             var util = require('${api.framework.dir}/Util.js');
 
             var apiConfig
@@ -82,11 +82,11 @@ x-ibm-configuration:
 
 
 
-            // log request headers
 
-            apiConfig.logHeaders(apim);
 
-            apiConfig.logBody(apim);
+            // log request headers and Audit Data
+
+            apiConfig.logAuditData(apim);
       - gatewayscript:
           title: Setup
           source: >-
@@ -123,15 +123,31 @@ x-ibm-configuration:
             var postTransformMethod = operation + 'PostTransform';
 
             apim.setvariable('postTransformMethod', postTransformMethod);
-
-
-
-            apiConfig.logger.debug(apim.getvariable('request.uri'));
-
-            apiConfig.logger.debug(apim.getvariable('request.path'));
       - gatewayscript:
           title: PreTransform
-          source: "// Load API Config\nvar util = require('${api.framework.dir}/Util.js');\nvar apiConfig = util.loadApiConfig('${api.framework.dir}/','${api.config.dir}/',apim.getvariable('env.path'),'${project.artifactId}}','${api.version}', console);\n\nvar transformer = require('${api.config.dir}/Transformations.js');\n\nvar transformMethodName = apim.getvariable('preTransformMethod');\nvar transformMethod = transformer[transformMethodName];\n\nif (transformMethod != null && typeof transformMethod === \"function\") {\n    var bodi = apim.getvariable('message.body');\n    var output = transformMethod('${api.framework.dir}/', apiConfig, apim);\n    \n    session.output.write(output);\n    apim.output('application/json');\n}"
+          source: >-
+            // Load API Config
+
+            var util = require('${api.framework.dir}/Util.js');
+
+            var apiConfig
+            = util.loadApiConfig('${api.framework.dir}/','${api.config.dir}/',apim.getvariable('env.path'),'${project.artifactId}}','${api.version}',
+            console);
+
+
+
+            var body = apim.getvariable('message.body');
+
+            apiConfig.logMessageBody(apim, 'Input');
+
+
+
+            var transformer = require('${api.config.dir}/Transformations.js');
+
+            var transformMethodName = apim.getvariable('preTransformMethod');
+
+            util.transformAndLog(transformer, transformMethodName,
+            '${api.framework.dir}/', apiConfig, apim);
       - operation-switch:
           title: Invoke URL switch
           case:
@@ -162,7 +178,29 @@ x-ibm-configuration:
           description: Specify target Method and caching options here
       - gatewayscript:
           title: PostTransform
-          source: "// Load API Config\nvar util = require('${api.framework.dir}/Util.js');\nvar apiConfig = util.loadApiConfig('${api.framework.dir}/','${api.config.dir}/',apim.getvariable('env.path'),'${project.artifactId}}','${api.version}', console);\n\nvar transformer = require('${api.config.dir}/Transformations.js');\n\nvar transformMethodName = apim.getvariable('postTransformMethod');\nvar transformMethod = transformer[transformMethodName];\n\nif (transformMethod != null && typeof transformMethod === \"function\") {\n    var bodi = apim.getvariable('message.body');\n    var output = transformMethod('${api.framework.dir}/', apiConfig, apim);\n    \n    session.output.write(output);\n    apim.output('application/json');\n}"
+          source: >-
+            // Load API Config
+
+            var util = require('${api.framework.dir}/Util.js');
+
+            var apiConfig
+            = util.loadApiConfig('${api.framework.dir}/','${api.config.dir}/',apim.getvariable('env.path'),'${project.artifactId}}','${api.version}',
+            console);
+
+
+
+            var body = apim.getvariable('message.body');
+
+            apiConfig.logMessageBody(apim, 'InvokeResponse');
+
+
+
+            var transformer = require('${api.config.dir}/Transformations.js');
+
+            var transformMethodName = apim.getvariable('postTransformMethod');
+
+            util.transformAndLog(transformer, transformMethodName,
+            '${api.framework.dir}/', apiConfig, apim);
           description: Transform Response
       - gatewayscript:
           title: Log Response
@@ -175,11 +213,11 @@ x-ibm-configuration:
 
 
 
-            // log request headers
 
-            apiConfig.logHeaders(apim);
 
-            apiConfig.logBody(apim);
+            // log response headers and Audit Data
+
+            apiConfig.logAuditData(apim);
   catalogs:
     catalog-name-1:
       properties:

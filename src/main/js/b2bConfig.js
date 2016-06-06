@@ -8,7 +8,7 @@ var logLevel=7;
 var config = [
               {name:"getPosts",
             	  methods:[
-            	           {name:"GET", targetUrl:"http://api-springboot.mybluemix.net/operate/add/51/56"}
+            	           {name:"GET", targetUrl:"http://api-springboot.mybluemix.net/operate/add/51/57"}
             	           ]
               },
               {name:"getPostById",
