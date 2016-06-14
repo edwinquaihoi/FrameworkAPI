@@ -86,7 +86,7 @@ x-ibm-configuration:
 
             // log request headers and Audit Data
 
-            apiConfig.logAuditData(apim);
+            apiConfig.logAuditData(apim, 'Input');
       - gatewayscript:
           title: Setup
           source: >-
@@ -138,7 +138,7 @@ x-ibm-configuration:
 
             var body = apim.getvariable('message.body');
 
-            apiConfig.logMessageBody(apim, 'Input');
+            apiConfig.logPayload(apim, 'Input');
 
 
 
@@ -159,7 +159,7 @@ x-ibm-configuration:
                     title: invoke
                     timeout: 60
                     verb: GET
-                    cache-response: no-cache
+                    cache-response: time-to-live
                     cache-ttl: 900
                     target-url: $(targetUrl)
             - operations:
@@ -191,7 +191,7 @@ x-ibm-configuration:
 
             var body = apim.getvariable('message.body');
 
-            apiConfig.logMessageBody(apim, 'InvokeResponse');
+            apiConfig.logPayload(apim, 'InvokeResponse');
 
 
 
@@ -217,7 +217,7 @@ x-ibm-configuration:
 
             // log response headers and Audit Data
 
-            apiConfig.logAuditData(apim);
+            apiConfig.logAuditData(apim, 'Output');
   catalogs:
     catalog-name-1:
       properties:
