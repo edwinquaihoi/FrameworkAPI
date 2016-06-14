@@ -11,10 +11,7 @@ describe("TransformationsTest",function() {
 	var console;
 	var apim;
 
-	var logger = require('Logger.js').newLogger({ 
-			name: "gatewayscript-user",
-			logLevel: "7"
-		}, console);
+	var logger;
 	var config = [
 	              {name:"/users",methods:[{name:"GET", targetUrl:"https://randomuser.me/api/users"}]},
 	              {name:"/users/all",methods:[{name:"GET", targetUrl:"https://randomuser.me/api/users/all"}]}
@@ -25,9 +22,13 @@ describe("TransformationsTest",function() {
 				[ 'debug', 'info', 'notice', 'warning', 'error', 'critical', 'alert', 'emergency','options' ]);
 		apim = jasmine.createSpyObj('apim',['getvariable']);
 		
+		logger = require('Logger.js').newLogger({ 
+			logLevel: "7"
+		}, console);
+	
 		var log = function(msg) {
 			print(msg);
-		}
+		};
 				
 		console.info.and.callFake(log);
 		console.notice.and.callFake(log);
